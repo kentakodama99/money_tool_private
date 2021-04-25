@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import data from '../assets/test.csv'
 export default {
   data() {
     return {
@@ -23,27 +22,14 @@ export default {
         { text: "交通費", align: "center", value: "travel_cost" }
       ],
       items:[],
-      datacsv:data
+      datacsv:"",
     };
   },
   methods:{
-    async getCsv(){
-      //tableに表示できる形式にする。(json)
-      const key = ["month","money","travel_cost"] //key
-      for(let i=0;i<this.datacsv.length - 1;i++){ //配列数だけ (配列が無駄に一個多い)
-        let tmp = new Object()
-        let vnum = 0 //valueカウント
-        for(let j=0;j<3;j++){ //要素数だけ
-          tmp[key[j]] = this.datacsv[i][vnum]; //i番目の配列の要素を順に連想配列に格納
-          vnum = vnum + 1  //value++
-        } //j for
-        this.items.push(tmp); //push
-      } //i for
-    console.log(this.items);
-    } //getCsv()
+    //
   },
   created(){
-    this.getCsv();
+    //
   }
 };
 </script>
