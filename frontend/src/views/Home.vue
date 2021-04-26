@@ -1,10 +1,23 @@
 <template>
   <div class="Home">
-    <v-container fluid>
-      <div class="mx-3">
+    <v-container fluid class="cyan lighten-4">
+      <div class="ma-3 pa-3 white">
         <h1 class="pa-2 text-center">お金管理ツール</h1>
         <div class="mt-10">
           <v-data-table :headers="headers" :items="items" class="elevation-1">
+            <template v-slot:item.lastmonth_money="{ item }">
+              <div v-if="dataIndex(item) == 0">0</div>
+              <div v-else>{{ arr_lm_moneys[dataIndex(item) - 1] }}</div>
+            </template>
+            <template v-slot:item.difference="{ item }">
+              <div class="pa-1">
+                {{item.difference}}
+                <div class="ma-1"><v-btn small color="primary" dark>更新</v-btn></div>
+              </div>
+            </template>
+            <template v-slot:item.thismonth_money="{ item }">
+              <div>{{ arr_lm_moneys[dataIndex(item)] }}</div>
+            </template>
           </v-data-table>
         </div>
       </div>
@@ -18,18 +31,38 @@ export default {
     return {
       headers: [
         { text: "月", align: "center", value: "month" },
+        { text: "前残高", align: "center", value: "lastmonth_money" },
         { text: "給料", align: "center", value: "money" },
-        { text: "交通費", align: "center", value: "travel_cost" }
+        { text: "交通費", align: "center", value: "travel_cost" },
+        { text: "差分", align: "center", value: "difference" },
+        { text: "今残高", align: "center", value: "thismonth_money" },
       ],
-      items:[],
-      datacsv:"",
-    };
+      datacsv:[],
+      items:[{ "month":1 ,"money":15000 ,"travel_cost":3000 ,"difference":2000 },
+      { "month":2 ,"money":11000 ,"travel_cost":3000 ,"difference":1000 },
+      { "month":3 ,"money":12000 ,"travel_cost":3000 ,"difference":500 }],
+      arr_lm_moneys:[],
+    }
+  },
+  computed:{
+    dataIndex(){
+      return ((item) => {
+        return this.items.indexOf(item);
+      })
+    }
   },
   methods:{
-    //
+    getLmMoneys(){
+      let arr = [];
+      for(let i = 0; i<this.items.length; i++){
+        if(i == 0){ arr.push(this.items[i].money - this.items[i].travel_cost - this.items[i].difference )
+        }else{ arr.push(arr[i-1] + this.items[i].money - this.items[i].travel_cost - this.items[i].difference); }
+      }
+      this.arr_lm_moneys = arr;
+    }
   },
   created(){
-    //
+    this.getLmMoneys()
   }
 };
 </script>
