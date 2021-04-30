@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   data() {
     return {
@@ -38,9 +39,7 @@ export default {
         { text: "今残高", align: "center", value: "thismonth_money" },
       ],
       datacsv:[],
-      items:[{ "month":1 ,"money":15000 ,"travel_cost":3000 ,"difference":2000 },
-      { "month":2 ,"money":11000 ,"travel_cost":3000 ,"difference":1000 },
-      { "month":3 ,"money":12000 ,"travel_cost":3000 ,"difference":500 }],
+      items:[],
       arr_lm_moneys:[],
     }
   },
@@ -52,17 +51,27 @@ export default {
     }
   },
   methods:{
+    async getItem(){
+      const path = "/users"
+      await axios.get(path)
+      .then(response => {
+        console.log(response);
+        this.items = response.data;
+        })
+      .catch(error => {console.log(error);});
+      this.getLmMoneys()
+    },
     getLmMoneys(){
       let arr = [];
       for(let i = 0; i<this.items.length; i++){
-        if(i == 0){ arr.push(this.items[i].money - this.items[i].travel_cost - this.items[i].difference )
-        }else{ arr.push(arr[i-1] + this.items[i].money - this.items[i].travel_cost - this.items[i].difference); }
+        if(i == 0){ arr.push(Number(this.items[i].money - this.items[i].travel_cost - this.items[i].difference))
+        }else{ arr.push(Number(arr[i-1]) + Number(this.items[i].money - this.items[i].travel_cost - this.items[i].difference)) }
       }
       this.arr_lm_moneys = arr;
     }
   },
   created(){
-    this.getLmMoneys()
+    this.getItem()
   }
 };
 </script>
