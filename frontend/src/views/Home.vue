@@ -2,6 +2,41 @@
   <div class="Home">
     <v-container fluid class="cyan lighten-4">
       <div class="ma-3 pa-3 white">
+        
+        <!-- dialog -->
+        <v-dialog v-model="put_dialog" max-width="500px">
+          <v-card>
+            <v-card-title>
+              <span class="headline">編集する</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container>
+                <v-form ref="put_form">
+                <v-row>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field v-model="put.month" label="月" :rules=[required]>月</v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field v-model="put.money" label="給料" :rules=[required]></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field v-model="put.travel_cost" label="交通費" :rules=[required]></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field v-model="put.difference" label="差分" :rules=[required]></v-text-field>
+                  </v-col>
+                </v-row>
+                </v-form>
+              </v-container>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="editClose">キャンセル</v-btn>
+                <v-btn color="blue darken-1" text @click="putItem">更新</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog><!-- dialog -->
+
         <h1 class="pa-2 text-center">お金管理ツール</h1>
         <div class="mt-10">
           <v-data-table :headers="headers" :items="items" class="elevation-1">
@@ -13,8 +48,8 @@
               <div>{{ arr_lm_moneys[dataIndex(item)] }}</div>
             </template>
             <template v-slot:item.menu="{ item }">
-                  <v-btn small class="ma-1 pa-1" color="primary" dark @click=put_item(item)>更新</v-btn>
-                  <v-btn small class="ma-1 pa-1" color="purple" dark @click=delete_item(item)>削除</v-btn>
+                  <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+        <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
             </template>
           </v-data-table>
         </div>
@@ -32,7 +67,7 @@
         </v-form>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn text @click="add_item">送信する</v-btn>
+          <v-btn text @click="addItem">送信する</v-btn>
         </v-card-actions>
       </v-card>
     </v-container>
@@ -59,6 +94,14 @@ export default {
         travel_cost:null,
         difference:null,
       },
+      put_Index: -1,
+      put_dialog: false,
+      put:{
+        month:"",
+        money:"",
+        travel_cost:"",
+        difference:"",
+      },
       required: value => !!value || "テキストが空欄です。",
       monthitems: [ 1,2,3,4,5,6,7,8,9,10,11,12 ],
       datacsv:[],
@@ -75,11 +118,10 @@ export default {
   },
   methods:{
     async getItem(){
-      const path = "http://localhost:5000/users" //CORS用
-      // const path = "/users"
+      // const path = "http://localhost:5000/users" //CORS用
+      const path = "/users"
       await axios.get(path)
       .then(response => {
-        console.log(response);
         this.items = response.data;
         })
       .catch(error => {console.log(error);});
@@ -93,15 +135,15 @@ export default {
       }
       this.arr_lm_moneys = arr;
     },
-    async add_item(){
+    async addItem(){
       if (this.$refs.add_form.validate()) {
         let params=new FormData()
         params.append("month",this.add.month)
         params.append("money",this.add.money)
         params.append("travel_cost",this.add.travel_cost)
         params.append("difference",this.add.difference)
-        const path = " http://localhost:5000/users" //CORS用
-        // const path = "/users"
+        // const path = " http://localhost:5000/users" //CORS用
+        const path = "/users"
         await axios.post(path,params)
         .then(response => {
           console.log(response);
@@ -112,6 +154,46 @@ export default {
       } else {
         alert("空欄を入力してください。"); }
     },
+    editItem(item){
+      this.put_Index = this.items.indexOf(item)
+      this.put = Object.assign({}, item)
+      this.put_dialog = true
+    },
+    editClose(){
+      this.put_dialog = false
+      this.put_Index = -1
+    },
+    async putItem(){
+      if (this.$refs.put_form.validate()) {
+        let params=new FormData()
+        params.append("month",this.put.month)
+        params.append("money",this.put.money)
+        params.append("travel_cost",this.put.travel_cost)
+        params.append("difference",this.put.difference)
+        // const path = "http://localhost:5000/users/"+this.put_Index //CORS用
+        const path = "/users/"+this.put_Index
+        await axios.put(path,params)
+        .then(response => {
+          console.log(response);
+          this.editClose()
+          this.getItem()
+        })
+        .catch(error => { console.log(error); });
+      } else { alert("空欄を入力してください。"); }
+    },
+    async deleteItem(item){
+      const deleteIndex = this.items.indexOf(item)
+      if (confirm("本当に消してもいいですか？（"+this.items[deleteIndex].month+"月分）")) {
+        // const path = "http://localhost:5000/users/"+deleteIndex //CORS用
+        const path = "/users/"+deleteIndex
+        await axios.delete(path)
+        .then(response => {
+          console.log(response);
+          this.getItem()
+        })
+        .catch(error => { console.log(error); });
+      }
+    }
   },
   created(){
     this.getItem()
