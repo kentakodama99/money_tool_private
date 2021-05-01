@@ -3,7 +3,7 @@ import csv
 # from flask_cors import CORS
 
 app = Flask(__name__, static_folder="./frontend/dist", static_url_path="")
-PATH = "./tmp/test.csv"
+PATH = "./csv/test.csv"
 # CORS(app)
 
 #RestAPI
