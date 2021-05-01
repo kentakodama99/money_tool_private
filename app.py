@@ -30,8 +30,7 @@ class objectCsv(object):
 @app.route('/users')
 def list_user():
     object_csv =  objectCsv()
-    csv_list = object_csv.getCsv()
-    return jsonify(csv_list)
+    return jsonify(object_csv.getCsv())
 
 @app.errorhandler(404)
 def index(_):
