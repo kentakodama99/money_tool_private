@@ -9,14 +9,12 @@
               <div v-if="dataIndex(item) == 0">0</div>
               <div v-else>{{ arr_lm_moneys[dataIndex(item) - 1] }}</div>
             </template>
-            <template v-slot:item.difference="{ item }">
-              <div class="pa-1">
-                {{item.difference}}
-                <div class="ma-1"><v-btn small color="primary" dark>更新</v-btn></div>
-              </div>
-            </template>
             <template v-slot:item.thismonth_money="{ item }">
               <div>{{ arr_lm_moneys[dataIndex(item)] }}</div>
+            </template>
+            <template v-slot:item.menu="{ item }">
+                  <v-btn small class="ma-1 pa-1" color="primary" dark @click=put_item(item)>更新</v-btn>
+                  <v-btn small class="ma-1 pa-1" color="purple" dark @click=delete_item(item)>削除</v-btn>
             </template>
           </v-data-table>
         </div>
@@ -34,7 +32,7 @@
         </v-form>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn text @click="add_submit">送信する</v-btn>
+          <v-btn text @click="add_item">送信する</v-btn>
         </v-card-actions>
       </v-card>
     </v-container>
@@ -53,6 +51,7 @@ export default {
         { text: "交通費", align: "center", value: "travel_cost" },
         { text: "差分", align: "center", value: "difference" },
         { text: "今残高", align: "center", value: "thismonth_money" },
+        { text: "menu", align: "center", value: "menu" },
       ],
       add:{
         month:null,
@@ -76,8 +75,8 @@ export default {
   },
   methods:{
     async getItem(){
-      // const path = "http://localhost:5000/users" //CORS用
-      const path = "/users"
+      const path = "http://localhost:5000/users" //CORS用
+      // const path = "/users"
       await axios.get(path)
       .then(response => {
         console.log(response);
@@ -94,15 +93,15 @@ export default {
       }
       this.arr_lm_moneys = arr;
     },
-    async add_submit(){
+    async add_item(){
       if (this.$refs.add_form.validate()) {
         let params=new FormData()
         params.append("month",this.add.month)
         params.append("money",this.add.money)
         params.append("travel_cost",this.add.travel_cost)
         params.append("difference",this.add.difference)
-        // const path = " http://localhost:5000/users" //CORS用
-        const path = "/users"
+        const path = " http://localhost:5000/users" //CORS用
+        // const path = "/users"
         await axios.post(path,params)
         .then(response => {
           console.log(response);
