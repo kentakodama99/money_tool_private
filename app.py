@@ -1,6 +1,7 @@
 from flask import Flask,render_template,send_file,jsonify,request
 from flask_httpauth import HTTPBasicAuth
 import csv
+from flask_httpauth import HTTPBasicAuth
 # from flask_cors import CORS
 # CORS(app)
 
@@ -17,7 +18,6 @@ auth = HTTPBasicAuth()
 users = {
     USERNAME:PASSWORD
 }
-
 @auth.get_password
 def get_pw(username):
     if username in users:
