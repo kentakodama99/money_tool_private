@@ -1,10 +1,28 @@
 from flask import Flask,render_template,send_file,jsonify,request
+from flask_httpauth import HTTPBasicAuth
 import csv
 # from flask_cors import CORS
+# CORS(app)
 
 app = Flask(__name__, static_folder="./frontend/dist", static_url_path="")
 PATH = "./tmp/test.csv"
-# CORS(app)
+#環境変数設定
+# app.config.from_object('config.devAuthConfig')
+# PATH = app.config['PATH']
+# USERNAME = app.config['USERNAME']
+# PASSWORD = app.config['PASSWORD']
+
+#Basic認証設定
+auth = HTTPBasicAuth()
+users = {
+    # USERNAME:PASSWORD
+    "test":"123"
+}
+@auth.get_password
+def get_pw(username):
+    if username in users:
+        return users.get(username)
+    return None
 
 #RestAPI
 class objectCsv(object):
@@ -90,6 +108,7 @@ def delete_user(user_id):
     return "OK"
 
 @app.errorhandler(404)
+@auth.login_required
 def index(_):
     return send_file("./frontend/dist/index.html")
 
