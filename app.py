@@ -5,19 +5,19 @@ import csv
 # CORS(app)
 
 app = Flask(__name__, static_folder="./frontend/dist", static_url_path="")
-PATH = "./tmp/test.csv"
+
 #環境変数設定
-# app.config.from_object('config.devAuthConfig')
-# PATH = app.config['PATH']
-# USERNAME = app.config['USERNAME']
-# PASSWORD = app.config['PASSWORD']
+app.config.from_object('config.devAuthConfig')
+PATH = app.config['PATH']
+USERNAME = app.config['USERNAME']
+PASSWORD = app.config['PASSWORD']
 
 #Basic認証設定
 auth = HTTPBasicAuth()
 users = {
-    # USERNAME:PASSWORD
-    "test":"123"
+    USERNAME:PASSWORD
 }
+
 @auth.get_password
 def get_pw(username):
     if username in users:
